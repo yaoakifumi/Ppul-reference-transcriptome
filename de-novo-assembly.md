@@ -1,11 +1,11 @@
-Theses analysis were partly performed using [NIG supercomputer system](https://sc.ddbj.nig.ac.jp), National Institute of Genetics, Research Organaization of Information and Systemes, Japan.
+These analysis were partly performed using [NIG supercomputer system](https://sc.ddbj.nig.ac.jp), National Institute of Genetics, Research Organaization of Information and Systemes, Japan.
 
 # De novo assembly
 
 
 ## Adapter trimming by Trimmomatic
-remove adapter sequences and low quality reads.
-adapter sequences are deposited in "adapter.fa"
+Remove adapter sequences and low quality reads.
+Adapter sequences are deposited in "adapter.fa"
 
 [Trimmomatic]() version 0.3.9
 ```
@@ -95,6 +95,13 @@ trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
 
 ## BUSCO analysis
 
+
+## gVolante
+[gVolante]()
+
+```
+Run gVolante on the web browser with default parameters
+```
 
 # Functional annotations
 
