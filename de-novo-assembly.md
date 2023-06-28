@@ -41,6 +41,8 @@ Trinity \
 ```
 
 ## Mapping by Trinity scripts
+
+align_and_estimate_abundance.pl
 ```
 trinityrnaseq-v2.13.2/util/align_and_estimate_abundance.pl \
 --transcripts /<path>/<to>/Trinity.fasta \
@@ -55,8 +57,24 @@ trinityrnaseq-v2.13.2/util/align_and_estimate_abundance.pl \
 --output_dir  /<path>/<to>/results/align_RSEM
 ```
 
-## Remove low-expressed contigs by Trinity scripts
+abundance_estimates_to_matrix.pl
+```
+trinityrnaseq-v2.13.2/util/abundance_estimates_to_matrix.pl \
+/<path>/<to>/results/align_RSEM/RSEM.isoforms.results \
+--est_method RSEM \
+--gene_trans_map /<patj>/<to>/align_RSEM/Trinity.fasta.gene_trans_map 
+```
 
+## Remove low-expressed contigs by Trinity scripts
+これはTPM1以下で切った時なので、後で修正する
+```
+trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
+--transcripts /<path>/<to>/results/Trinity.fasta \
+--min_expr_any 1 \
+--trinity_mode \
+--matrix /<path>/<to>/results/align_RSEM/RSEM.isoform.TPM.not_cross_norm  \
+> /<path>/<to>/results/Ppul_lowcut.fasta 
+```
 
 ## Extract protein-coding contigs by TransDecoder
 
