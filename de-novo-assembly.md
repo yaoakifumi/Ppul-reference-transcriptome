@@ -95,12 +95,14 @@ trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
 
 ## BUSCO analysis
 
-
-## gVolante
-[gVolante]()
+Raw assembled contigs
+```
 
 ```
-Run gVolante on the web browser with default parameters
+
+Final reference transcriptome
+```
+
 ```
 
 # Functional annotations
@@ -140,7 +142,7 @@ Formatting BLAST results
 
 Integrate data
 ```{R}
-
+library(tidyverse)
 ```
 
 
