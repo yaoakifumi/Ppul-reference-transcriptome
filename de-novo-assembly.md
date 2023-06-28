@@ -87,13 +87,19 @@ trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
 ## Integrate similar contigs by CD-HIT
 [CD-HIT]() version
 
+## Pick up renamined contigs
+seqkit
+
 ## rename contigs
 [seqtk]() version
+```
 
+```
 
 # Quality checking
 
 ## BUSCO analysis
+[BUSCO]() version
 
 Raw assembled contigs
 ```
