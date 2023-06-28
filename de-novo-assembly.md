@@ -92,5 +92,48 @@ trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
 ## BUSCO analysiss
 
 
+# Functional annotations
+後で別のMarkdownに分ける
+
+## Egg-nog mapper
+
+
+```
+Run egg-nog mapper
+```
+
+## KAAS
+
+```
+Run KAAS
+```
+
+## Reciplocal BLAST best-hit via medaka non-redundant CDSs
+Pick up longest isoforms from RefSeq database
+```{R}
+
+```
+
+Construct BLAST database
+```
+
+```
+
+Run BLAST
+```
+
+```
+
+Integrate data
+```{R}
+
+```
+
+
+
+
+
+
+
 
 
