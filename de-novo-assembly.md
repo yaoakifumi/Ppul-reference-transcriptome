@@ -1,10 +1,13 @@
+Theses analysis were partly performed using [NIG supercomputer system](https://sc.ddbj.nig.ac.jp), National Institute of Genetics, Research Organaization of Information and Systemes, Japan.
+
 # De novo assembly
 
-Theses analysis were partly performed using NIG supercomputer system.
 
 ## Adapter trimming by Trimmomatic
 remove adapter sequences and low quality reads.
 adapter sequences are deposited in "adapter.fa"
+
+[Trimmomatic]() version 0.3.9
 ```
 trimmomatic PE \ 
  -phred33 \
@@ -24,12 +27,14 @@ trimmomatic PE \
 
 ## Quality check by FastQC
 Quality check 
+[FastQC]() version 0.11.9
 ```
 fastqc paired_output_read1.fq.gz
 fastqc paired_output_read2.fq.gz
 ```
 ## De novo assembly by Trinity
 
+[Trinity]() version 2.13.2
 ```
 Trinity \
 --seqType fq \
@@ -77,35 +82,32 @@ trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
 ```
 
 ## Extract protein-coding contigs by TransDecoder
-
+[TransDecoder]() version 
 
 ## Integrate similar contigs by CD-HIT
-
+[CD-HIT]() version
 
 ## rename contigs
+[seqtk]() version
 
-
-## 
 
 # Quality checking
 
-## BUSCO analysiss
+## BUSCO analysis
 
 
 # Functional annotations
-後で別のMarkdownに分ける
-
-## Egg-nog mapper
 
 
+## eggNOG-mapper
 ```
-Run egg-nog mapper
+Run eggNOG-mapper on the web browser with default parameters
 ```
 
 ## KAAS
 
 ```
-Run KAAS
+Run KAAS on the web browser with default parameter
 ```
 
 ## Reciplocal BLAST best-hit via medaka non-redundant CDSs
@@ -120,6 +122,11 @@ Construct BLAST database
 ```
 
 Run BLAST
+```
+
+```
+
+Formatting BLAST results
 ```
 
 ```
