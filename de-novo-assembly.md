@@ -88,7 +88,7 @@ trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
 [CD-HIT]() version
 
 ## Pick up renamined contigs
-seqkit
+[seqkit]() version2.4
 
 ## rename contigs
 [seqtk]() version
@@ -128,7 +128,17 @@ Run KAAS on the web browser with default parameter
 ## Reciplocal BLAST best-hit via medaka non-redundant CDSs
 Pick up longest isoforms from RefSeq database
 ```{R}
+library(orthologr)
+library(biomartr)
 
+medaka_proteome <- biomartr::getProteome(db = "refseq", 
+                    organism = "Oryzias latipes")
+medaka_gff <- biomartr::getGFF(db = "refseq", 
+                    organism = "Oryzias latipes")
+
+retrieve_longest_isoforms(proteome_file = medaka_proteome, 
+                          annotation_file = medaka_gff, 
+                          new_file = "medaka_longest_peptide.fasta")
 ```
 
 Construct BLAST database
