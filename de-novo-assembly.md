@@ -128,7 +128,6 @@ Run KAAS on the web browser with default parameter
 ## Reciplocal BLAST best-hit via medaka non-redundant CDSs
 ### Pick up longest isoforms from RefSeq database by R
 ```{R}
-#library
 library(orthologr)
 library(biomartr)
 
@@ -143,14 +142,14 @@ retrieve_longest_isoforms(proteome_file = medaka_proteome,
                           new_file = "medaka_longest_peptide.fasta")
 ```
 
-### blastp version
+### blastp
+[blastp]() version
 ```
 
 ```
 
 ### Formatting BLAST results by R
 ```{R}
-#library
 library(tidyverse)
 library(openxlsx)
 library(janitor)
@@ -198,23 +197,36 @@ reciprocal_blast_annotation <- merge_blast_nonredundant %>%
 reciprocal_blast_annotation <- reciprocal_blast_annotation %>%
   dplyr::distinct(accession, id, .keep_all = TRUE)
 
-#save data
+#save the result
 reciprocal_blast_annotation %>%
   write.xlsx("supertranscripts_reciprocal_blast_annotation.xlsx")
 ```
 
-Integrate data by R
+### anntation information integration by R
 ```{R}
 library(tidyverse)
 library(openxlsx)
 
-load data
+#load data
 eggnog_data <- read.xlsx("<path>/<to>eggnog_results.xlsx")
 kaas_data <- read.xlsx("<path>/<to>/KAAS_results.xlsx")
 blast_data <- read.xlsx("<path>/<to>/supertranscripts_reciprocal_blast_annotation.xlsx")
 
+#data curation
+eggnog_summary <- eggnog_data %>%
+  select(query, Description, Preferred_name)
+kaas_summary <- kaas_data %>%
+  drop_na(KEGG)
 
+#data integration
+merge_tmp <- eggnog_summary %>%
+  full_join(kaas_summary, by = c("query" = "id"))
+merge_annotations <- merge_tmp %>%
+  full_join(blast_data, by = c("query" = "id"))
 
+#save the result
+merge_annotations %>%
+  write.xlsx("annotations_threemethods.xlsx")
 ```
 
 
