@@ -45,56 +45,7 @@ Trinity \
 --output /<path>/<to>/trinity_run
 ```
 
-## Mapping by Trinity scripts
 
-align_and_estimate_abundance.pl
-```
-trinityrnaseq-v2.13.2/util/align_and_estimate_abundance.pl \
---transcripts /<path>/<to>/Trinity.fasta \
---seqType fq \
---left /<path>/<to>/paired_output_read1.fq.gz \
---right /<path>/<to>/paired_output_read2.fq.gz \
---est_method RSEM \
---aln_method bowtie2 \
---trinity_mode \
---thread_count 6 \
---prep_reference \
---output_dir  /<path>/<to>/results/align_RSEM
-```
-
-abundance_estimates_to_matrix.pl
-```
-trinityrnaseq-v2.13.2/util/abundance_estimates_to_matrix.pl \
-/<path>/<to>/results/align_RSEM/RSEM.isoforms.results \
---est_method RSEM \
---gene_trans_map /<patj>/<to>/align_RSEM/Trinity.fasta.gene_trans_map 
-```
-
-## Remove low-expressed contigs by Trinity scripts
-これはTPM1以下で切った時なので、後で修正する
-```
-trinityrnaseq-v2.13.2/util/filter_low_expr_transcripts.pl \
---transcripts /<path>/<to>/results/Trinity.fasta \
---min_expr_any 1 \
---trinity_mode \
---matrix /<path>/<to>/results/align_RSEM/RSEM.isoform.TPM.not_cross_norm  \
-> /<path>/<to>/results/Ppul_lowcut.fasta 
-```
-
-## Extract protein-coding contigs by TransDecoder
-[TransDecoder]() version 
-
-## Integrate similar contigs by CD-HIT
-[CD-HIT]() version
-
-## Pick up renamined contigs
-[seqkit]() version2.4
-
-## rename contigs
-[seqtk]() version
-```
-
-```
 
 # Quality checking
 
@@ -111,21 +62,24 @@ Final reference transcriptome
 
 ```
 
+## back-mapping 
+
 # Functional annotations
 
 
 ## eggNOG-mapper
+[eggNog-mapper]{http://eggnog-mapper.embl.de}
 ```
 Run eggNOG-mapper on the web browser with default parameters
 ```
 
 ## KAAS
-
+[KAAS-KEGG Automatic Annotation Server](https://www.genome.jp/tools/kaas/)
 ```
 Run KAAS on the web browser with default parameter
 ```
 
-## Reciplocal BLAST best-hit via medaka non-redundant CDSs
+## Reciprocal BLAST best-hit via medaka non-redundant CDSs
 ### Pick up longest isoforms from RefSeq database by R
 ```{R}
 library(orthologr)
@@ -143,9 +97,54 @@ retrieve_longest_isoforms(proteome_file = medaka_proteome,
 ```
 
 ### blastp
-[blastp]() version
+[blastp]() version 2.13.0
 ```
+#make blast database (from P. pulehcella superTranscripts)
+makeblastdb \
+-in /<path>/<to>/Ppul_supertranscripts.fasta.transdecoder.pep \
+-out Ppul_supertranscripts_pep \
+-dbtype prot \
+-parse_seqids
 
+#make blast database (from medaka non-redundant sequences)
+makeblastdb \
+-in /<path>/<to>/medaka_longest_peptide.fasta \
+-out medaka_longest \
+-dbtype prot \
+-parse_seqids
+
+#query: medaka non-redundant sequence, database: P. pulchella superTranscripts
+blastp \
+-query /<path>/<to>/medaka_longest_peptide.fasta \
+-db /<path>/<to>/Ppul_supertranscripts_pep  \
+-out /<path>/<to>/0816medaka_to_ppul.asn \
+-evalue 1e-4 \
+-outfmt 11 \
+-max_target_seqs 1 \
+-num_threads 16
+
+#blast formatter
+blast_formatter \
+-archive /<path>/<to>/0816medaka_to_ppul.asn \
+-outfmt 6 \
+-out /<path>/<to>/0816medaka_to_ppul.tsv
+
+#query: P. pulehcella superTranscripts, database: medaka non-redundant sequence
+blastp \
+-query /<path>/<to>/supertranscripts_protein.fasta \
+-db /<path>/<to>/medaka_longest  \
+-out /<path>/<to>/0816ppul_to_medaka.asn \
+-evalue 1e-4 \
+-outfmt 11 \
+-max_target_seqs 1 \
+-num_threads 16
+
+#blast formatter
+singularity exec /usr/local/biotools/b/blast:2.13.0--hf3cf87c_0/ \
+blast_formatter \
+-archive /<path>/<to>/0816ppul_to_medaka.asn \
+-outfmt 6 \
+-out /<path>/<to>/0816ppul_to_medaka.tsv
 ```
 
 ### Formatting BLAST results by R
@@ -156,8 +155,8 @@ library(janitor)
 
 #load blast data
 #Header information was attached to the tsv files before loading data.
-medaka_to_ppul <- read_tsv("blastp_medaka_to_ppul.tsv")
-ppul_to_medaka <- read_tsv("blastp_ppul_to_medaka.tsv")
+medaka_to_ppul <- read_tsv("0816medaka_to_ppul.tsv")
+ppul_to_medaka <- read_tsv("0816ppul_to_medaka.tsv")
 
 #table curation
 medaka_to_ppul <- medaka_to_ppul %>%
