@@ -126,11 +126,13 @@ Run KAAS on the web browser with default parameter
 ```
 
 ## Reciplocal BLAST best-hit via medaka non-redundant CDSs
-Pick up longest isoforms from RefSeq database
+### Pick up longest isoforms from RefSeq database by R
 ```{R}
+#library
 library(orthologr)
 library(biomartr)
 
+#get data from Ensembl
 medaka_proteome <- biomartr::getProteome(db = "refseq", 
                     organism = "Oryzias latipes")
 medaka_gff <- biomartr::getGFF(db = "refseq", 
@@ -141,24 +143,78 @@ retrieve_longest_isoforms(proteome_file = medaka_proteome,
                           new_file = "medaka_longest_peptide.fasta")
 ```
 
-Construct BLAST database
+### blastp version
 ```
 
 ```
 
-Run BLAST
+### Formatting BLAST results by R
+```{R}
+#library
+library(tidyverse)
+library(openxlsx)
+library(janitor)
+
+#load blast data
+#Header information was attached to the tsv files before loading data.
+medaka_to_ppul <- read_tsv("blastp_medaka_to_ppul.tsv")
+ppul_to_medaka <- read_tsv("blastp_ppul_to_medaka.tsv")
+
+#table curation
+medaka_to_ppul <- medaka_to_ppul %>%
+  select(accession, id, evalue_mtp, bit_score_mtp) 
+ppul_to_medaka <- ppul_to_medaka %>%
+  select(id, accession, evalue_ptm, bit_score_ptm)
+
+medaka_to_ppul <- medaka_to_ppul %>%
+  mutate(id = str_replace_all(medaka_to_ppul$id, 
+                              "\\.p*\\d", ""))
+
+#merge data
+merge_blast <- medaka_to_ppul %>%
+  inner_join(ppul_to_medaka, by = c("id", "accession")) %>%
+  as_tibble()
+
+#retain only results with the highest bit-score
+merge_blast_nonredundant <- merge_blast %>%
+  group_by(accession, id) %>%
+  slice_max(bit_score_mtp, n = 1, with_ties = TRUE) %>%
+  slice_max(bit_score_ptm, n = 1, with_ties = FALSE) %>%
+  as_tibble()
+
+#modify accession ID
+merge_blast_nonredundant <- merge_blast_nonredundant %>%
+  mutate(accession_clean = str_replace_all(merge_blast_nonredundant$accession, 
+                                     "\\.\\d", ""))
+#add gene name
+medaka_id <- read_csv("/Users/yaoakifumi/Desktop/Research/bioinformatics/Ppul_analysis/re_assembly/annotation/ensembl_medaka_id.csv")
+
+reciprocal_blast_annotation <- merge_blast_nonredundant %>%
+  left_join(medaka_id,
+            by = c("accession_clean" = "refseq_ID")) %>%
+  dplyr::select(id, accession, external_gene_name, description)
+
+#remove redundant row
+reciprocal_blast_annotation <- reciprocal_blast_annotation %>%
+  dplyr::distinct(accession, id, .keep_all = TRUE)
+
+#save data
+reciprocal_blast_annotation %>%
+  write.xlsx("supertranscripts_reciprocal_blast_annotation.xlsx")
 ```
 
-```
-
-Formatting BLAST results
-```
-
-```
-
-Integrate data
+Integrate data by R
 ```{R}
 library(tidyverse)
+library(openxlsx)
+
+load data
+eggnog_data <- read.xlsx("<path>/<to>eggnog_results.xlsx")
+kaas_data <- read.xlsx("<path>/<to>/KAAS_results.xlsx")
+blast_data <- read.xlsx("<path>/<to>/supertranscripts_reciprocal_blast_annotation.xlsx")
+
+
+
 ```
 
 
