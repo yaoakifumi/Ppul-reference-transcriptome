@@ -1,4 +1,4 @@
-These analysis were partly performed using [NIG supercomputer system](https://sc.ddbj.nig.ac.jp), National Institute of Genetics, Research Organaization of Information and Systemes, Japan.
+These analyses were partly performed using [NIG supercomputer system](https://sc.ddbj.nig.ac.jp), National Institute of Genetics, Research Organaization of Information and Systemes, Japan.
 
 # De novo assembly
 
@@ -118,25 +118,6 @@ TransDecoder.Predict \
 -O /<path>/<to>/transdecoder_ref_supertranscripts
 ```
 
-# Data curation by other methods
-## CD-HIT-EST
-[CD-HIT-EST](https://sites.google.com/view/cd-hit) version
-```
-
-```
-
-## EvidentialGene
-[EvidentialGene](http://arthropods.eugenes.org/EvidentialGene/about/EvidentialGene_trassembly_pipe.html) version
-```
-
-```
-
-### Assembly statistics
-[seqkit](https://bioinf.shenwei.me/seqkit/) version
-```
-seqkit stats -a
-seqkit stats -a
-```
 
 # Quality assessment
 
@@ -356,6 +337,51 @@ merge_annotations %>%
   write.xlsx("annotations_threemethods.xlsx")
 ```
 
+
+# Data curation by other methods
+We also conducted other methods for curation.
+
+## CD-HIT-EST
+[CD-HIT-EST](https://sites.google.com/view/cd-hit) version 4.8.1
+```
+cd-hit-est \
+-i /<path>/<to>/Trinity.fasta \
+-c 0.95 \
+-T 15 \
+-M 0 \
+-o /<path>/<to>/trinity_cdhitest95.fasta
+```
+
+## EvidentialGene
+[EvidentialGene](http://arthropods.eugenes.org/EvidentialGene/about/EvidentialGene_trassembly_pipe.html) version
+```
+perl /<path>/<to>/evigene/scripts/prot/tr2aacds4.pl \
+-cdnaseq \
+/<path>/<to>/Trinity.fasta \
+-NCPU=10 \
+-MAXMEM=32000 \
+-MINCDS=100 \
+-logfile
+```
+
+## ORF prediction
+[TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) version 5.7.0
+
+```
+#CD-HIT-EST
+
+#EvidentialGene
+
+```
+
+
+### Assembly statistics
+[seqkit](https://bioinf.shenwei.me/seqkit/) version 2.4.0
+
+```
+seqkit stats -a
+seqkit stats -a
+```
 
 
 
