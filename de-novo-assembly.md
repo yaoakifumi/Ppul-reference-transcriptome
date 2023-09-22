@@ -2,7 +2,7 @@ These analyses were partly performed using [NIG supercomputer system](https://sc
 
 # De novo assembly
 
-## Adapter trimming by Trimmomatic
+## Adapter trimming using Trimmomatic
 Remove adapter sequences and low quality reads.
 Adapter sequences are deposited in "adapter.fa"
 
@@ -24,15 +24,15 @@ trimmomatic PE \
  MINLEN:50
 ```
 
-## Quality check by FastQC
+## Quality check using FastQC
 Quality check 
 [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) version 0.11.9
 ```
 fastqc paired_output_read1.fq.gz
 fastqc paired_output_read2.fq.gz
 ```
-## De novo assembly by Trinity
-
+## De novo assembly using Trinity
+De novo assembly using Trinity with default parameters
 [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) version 2.13.2
 ```
 Trinity \
@@ -45,13 +45,13 @@ Trinity \
 ```
 
 ## Assembly statistics
-[seqkit](https://bioinf.shenwei.me/seqkit/) version
+[seqkit](https://bioinf.shenwei.me/seqkit/) version 2.4.0
 ```
 seqkit stats -a Trinity.fasta
 ```
 
 # superTranscripts
-## mapping by salmon
+## mapping using salmon
 [salmon](https://combine-lab.github.io/salmon/) version 1.7.0
 ```
 salmon index -p 8 \
@@ -104,7 +104,7 @@ Pp- > \
 seqkit stats -a Ppul_supertranscripts.fasta
 ```
 
-## ORF prediction
+## ORF prediction using TranDecoder
 [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) version 5.7.0
 ```
 TransDecoder.LongOrfs \
@@ -143,7 +143,7 @@ busco \
 --auto-lineage-euk
 ```
 
-## back-mapping 
+## back-mapping using salmon
 [samlon](https://combine-lab.github.io/salmon/) version 1.7.0
 
 Raw assembled contigs (same as superTranscripts construction)
@@ -188,7 +188,7 @@ For conducting reciprocal BLAST anaysis, header name of protein sequences (gener
 sed Ppul_supertranscripts.fasta.transdecoder.pep -e 's/\.p.*//' > supertranscripts_protein.fasta
 ```
 
-### Pick up longest isoforms from RefSeq database by R
+### Pick up longest isoforms from RefSeq database using R
 ```{R}
 library(orthologr)
 library(biomartr)
@@ -255,12 +255,44 @@ blast_formatter \
 -out /<path>/<to>/0816ppul_to_medaka.tsv
 ```
 
-### Formatting BLAST results by R
-### TO DO: メダカのアノテーション情報のリストを作るためのコードを追記する
+### Formatting BLAST results using R
 ```{R}
 library(tidyverse)
 library(openxlsx)
 library(janitor)
+library(biomaRt)
+
+#---------------------------------------------------------------
+#Medaka gene annotation data 
+
+#search ensemble database
+db <- useMart("ensembl")
+#view(listDatasets(db))
+
+#get medaka dataset
+medaka_data <- useDataset("olatipes_gene_ensembl", mart = db)
+
+view(listAttributes(medaka_data))
+
+#get data
+medaka_genename <- getBM(attributes = c( 
+  "refseq_peptide", "refseq_peptide_predicted", 
+  "external_gene_name", "description"), 
+  mart = medaka_data)
+
+as_tibble(medaka_genename)
+
+#make list
+medaka_id <- medaka_genename %>%
+  tidyr::pivot_longer(c("refseq_peptide", "refseq_peptide_predicted"), 
+                      names_to = "mean", values_to = "refseq_ID") %>%
+  filter(refseq_ID != "") %>%
+  dplyr::select(refseq_ID, external_gene_name, description)
+
+write_csv(medaka_id, "ensembl_medaka_id.csv")
+
+#---------------------------------------------------------------
+#integration of blast data
 
 #load blast data
 #Header information was attached to the tsv files before loading data.
@@ -310,7 +342,7 @@ reciprocal_blast_annotation %>%
   write.xlsx("supertranscripts_reciprocal_blast_annotation.xlsx")
 ```
 
-### anntation information integration by R
+### anntation information integration using R
 ```{R}
 library(tidyverse)
 library(openxlsx)
@@ -338,7 +370,7 @@ merge_annotations %>%
 ```
 
 
-# Data curation by other methods
+# Data curation using other methods
 We also conducted other methods for curation.
 
 ## CD-HIT-EST
@@ -353,7 +385,7 @@ cd-hit-est \
 ```
 
 ## EvidentialGene
-[EvidentialGene](http://arthropods.eugenes.org/EvidentialGene/about/EvidentialGene_trassembly_pipe.html) version
+[EvidentialGene](http://arthropods.eugenes.org/EvidentialGene/about/EvidentialGene_trassembly_pipe.html)
 ```
 perl /<path>/<to>/evigene/scripts/prot/tr2aacds4.pl \
 -cdnaseq \
@@ -369,6 +401,13 @@ perl /<path>/<to>/evigene/scripts/prot/tr2aacds4.pl \
 
 ```
 #CD-HIT-EST
+TransDecoder.LongOrfs -t /<path>/<to>/trinity_cdhitest95.fasta \
+-O /<path>/<to>/transdecoder_trinity_cdhitest95 \
+-m 100
+
+TransDecoder.Predict -t /<path>/<to>/trinity_cdhitest95.fasta \
+--single_best_only \
+-O /<path>/<to>/transdecoder_trinity_cdhitest95
 
 #EvidentialGene
 
@@ -379,7 +418,7 @@ perl /<path>/<to>/evigene/scripts/prot/tr2aacds4.pl \
 [seqkit](https://bioinf.shenwei.me/seqkit/) version 2.4.0
 
 ```
-seqkit stats -a
+seqkit stats -a trinity_cdhitest95.fasta.transdecoder.cds
 seqkit stats -a
 ```
 
