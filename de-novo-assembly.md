@@ -1,4 +1,6 @@
-# Parapercis pulehcella reference transcriptome assembly
+# Parapercis pulchella reference transcriptome assembly
+Reference transcriptome of the harlequin sandsmelt Parapercis pulehella was constructed from RNA-sequencing data.
+
 These analyses were partly performed using [NIG supercomputer system](https://sc.ddbj.nig.ac.jp), National Institute of Genetics, Research Organaization of Information and Systemes, Japan.
 
 ## De novo assembly
