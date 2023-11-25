@@ -204,7 +204,7 @@ sed Ppul_supertranscripts.fasta.transdecoder.pep -e 's/\.p.*//' > supertranscrip
 ```
 
 #### Pick up longest isoforms from RefSeq database using R
-```{R}
+```R
 library(orthologr)
 library(biomartr)
 
@@ -273,7 +273,7 @@ blast_formatter \
 
 #### Formatting BLAST results using R
 
-```{R}
+```R
 library(tidyverse)
 library(openxlsx)
 library(janitor)
@@ -362,7 +362,7 @@ reciprocal_blast_annotation %>%
 
 ### anntation information integration using R
 
-```{R}
+```R
 library(tidyverse)
 library(openxlsx)
 
