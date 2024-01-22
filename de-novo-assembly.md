@@ -58,7 +58,7 @@ Trinity \
 seqkit stats -a Trinity.fasta
 ```
 
-## superTranscripts
+## superTranscripts construction
 ### mapping using salmon
 [salmon](https://combine-lab.github.io/salmon/) version 1.7.0
 
@@ -136,7 +136,7 @@ TransDecoder.Predict \
 ### BUSCO analysis
 [BUSCO](https://busco.ezlab.org) version 5.1.2
 
-Raw assembled contigs
+#### Raw assembled contigs
 ```shell
 busco \
 -m transcriptome \
@@ -145,7 +145,7 @@ busco \
 --auto-lineage-euk
 ```
 
-Final superTranscripts
+#### Final superTranscripts
 ```shell
 busco \
 -m transcriptome \
@@ -155,15 +155,15 @@ busco \
 --auto-lineage-euk
 ```
 
-### back-mapping using salmon
+### Back-mapping using salmon
 [samlon](https://combine-lab.github.io/salmon/) version 1.7.0
 
-Raw assembled contigs (same as superTranscripts construction)
+#### Raw assembled contigs (same as superTranscripts construction)
 ```
 Described above
 ```
 
-Final superTranscripts
+#### Final superTranscripts
 ```shell
 #salmon index
 salmon index -p 2 \
@@ -177,6 +177,35 @@ salmon quant -p 15 \
 -1 /<path>/<to>/paired_output_read1.fq.gz \
 -2 /<path>/<to>/paired_output_read2.fq.gz \
 --output /<path>/<to>/salmon_supertranscripte_lcae/output
+```
+
+### Back-mapping using STAR (for superTranscripts)
+[STAR](https://github.com/alexdobin/STAR) version 2.7.8a
+
+Multi-fasta file (SuperDuper.fasta) and annotation file (SuperDuper.gff) produced by [lace](https://github.com/Oshlack/Lace/wiki) were subjected to STAR as reference.
+
+#### Make STAR index from SuperDuper.fasta and SuperDuper.gff
+```shell
+STAR \
+--runMode genomeGenerate \
+--genomeDir /<path>/<to>/STAR_lace_supertranscripts \
+--runThreadN 8 \
+--genomeFastaFiles /<path>/<to>/supertranscripts_lace/SuperDuper.fasta \
+--sjdbGTFfile /<path>/<to>/supertranscripts_lace/SuperDuper.gff \
+--limitGenomeGenerateRAM 64231571722
+```
+
+#### Back-mapping
+```shell
+STAR \
+--genomeDir /<path>/<to>/STAR_lace_supertranscripts \
+--runThreadN 24 \
+--outFileNamePrefix /<path>/<to>/STAR_lace_supertranscripts/output/ \
+--quantMode TranscriptomeSAM \
+--outSAMtype BAM SortedByCoordinate \
+--readFilesIn /<path>/<to>/paired_output_read1.fq.gz \
+/<path>/<to>/paired_output_read2.fq.gz \
+--readFilesCommand gunzip -c
 ```
 
 ## Functional annotations
