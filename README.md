@@ -3,7 +3,7 @@
 
 The code and the dataset generated from this code have been published in Yao et al. 2024 Marine Genomics.
 
-"Reference transcriptome assembly of a protogynous sex change fish, harlequin sandsmelt (Parapercis pulchella)"
+"Reference transcriptome assembly of a protogynous sex change fish, harlequin sandsmelt (<i>Parapercis pulchella</i>)"
 
 https://pubmed.ncbi.nlm.nih.gov/38365348/
 
