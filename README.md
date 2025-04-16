@@ -11,4 +11,4 @@ https://doi.org/10.1016/j.margen.2024.101086
 
 If you use this code, please kindly cite the above paper.
 
-Contact: Akifumi Yao, yao@mmbs.s.u-tokyo.ac.jp
+Contact: Akifumi Yao, ayao@nig.ac.jp or yaoakifumi.biol@gmail.com
